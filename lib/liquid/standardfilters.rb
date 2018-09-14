@@ -155,10 +155,11 @@ module Liquid
     # by default the target value is assumed to be `true`.
     def where(input, property, target_value = nil)
       ary = InputIterator.new(input)
-      target_value = true if target_value.nil?
 
       if ary.empty?
         []
+      elsif ary.first.respond_to?(:[]) && target_value.nil?
+        ary.where_present(property)
       elsif ary.first.respond_to?(:[])
         ary.where(property, target_value)
       end
@@ -450,7 +451,15 @@ module Liquid
       rescue TypeError
         # Cannot index with the given property type (eg. indexing integers with strings
         # which are only allowed to be indexed by other integers).
-        raise ArgumentError.new("cannot select the property \"#{property}\"")
+        raise ArgumentError.new("cannot select the property `#{property}`")
+      end
+
+      def where_present(property)
+        select { |item| item[property] }
+      rescue TypeError
+        # Cannot index with the given property type (eg. indexing integers with strings
+        # which are only allowed to be indexed by other integers).
+        raise ArgumentError.new("cannot select the property `#{property}`")
       end
     end
   end

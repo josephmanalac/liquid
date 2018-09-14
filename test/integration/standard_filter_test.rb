@@ -211,6 +211,7 @@ class StandardFiltersTest < Minitest::Test
   def test_sort_empty_array
     assert_equal [], @filters.sort([], "a")
   end 
+
   def test_sort_natural_empty_array
     assert_equal [], @filters.sort_natural([], "a")
   end
@@ -618,6 +619,16 @@ class StandardFiltersTest < Minitest::Test
     assert_nil @filters.where([nil], "ok")
   end
 
+  def test_where_no_target_value
+    input = [
+      { "foo" => false },
+      { "foo" => true },
+      { "foo" => "for sure" },
+      { "bar" => true }
+    ]
+
+    assert_equal [{ "foo" => true }, { "foo" => "for sure" }], @filters.where(input, "foo")
+  end
 
   private
 
